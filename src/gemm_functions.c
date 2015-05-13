@@ -12,7 +12,7 @@
 static void compute_gemm_blas3(CMDOptions * options, double * C, double * A, double * B)
 {
 	cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, options->m, options->n, options->k,
-			1.0, A, options->k, B, options->n, 1.0, C, options->m);
+			1.0, A, options->k, B, options->n, 1.0, C, options->n);
 }
 
 

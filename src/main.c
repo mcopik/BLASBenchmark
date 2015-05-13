@@ -1,26 +1,17 @@
-#include <stdbool.h>
+//enable drand48 in C99 - declarations of functions are in a conditional preprocessor directive
+#define _XOPEN_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
+#include <time.h>
 
 /**
  * GNU C library.
  */
 #include <getopt.h>
 
-
-typedef struct _CMDOptions {
-	bool test;
-	const char * matrix_source_A;
-	const char * matrix_source_B;
-	const char * test_dest;
-	unsigned int m;
-	unsigned int n;
-	unsigned int k;
-	unsigned int iterations;
-	unsigned int blasLevel;
-	unsigned int configurationNumber;
-} CMDOptions;
+#include "gemm_functions.h"
 
 int process_options(CMDOptions * opts, int argc, char ** argv)
 {
@@ -85,6 +76,7 @@ int process_options(CMDOptions * opts, int argc, char ** argv)
 				return 1;
 		}
 	}
+	return 0;
 }
 
 int main(int argc, char ** argv)
@@ -102,7 +94,8 @@ int main(int argc, char ** argv)
 			.test = false
 	};
 
-	if( !process_options(&options, argc, argv) ) {
+	if( process_options(&options, argc, argv) ) {
+		abort();
 		return 1;
 	}
 
@@ -113,14 +106,34 @@ int main(int argc, char ** argv)
 	C = malloc( sizeof(double) * options.m * options.n);
 	B = malloc( sizeof(double) * options.k * options.n );
 	A = malloc( sizeof(double) * options.m * options.k );
-	memset(C, sizeof(double) * options.m * options.n, 0 );
+	memset(C, 0, sizeof(double) * options.m * options.n);
 
 	if( options.test ) {
 		//load data
+		printf("ok\n");
 	} else {
-		//generate randomly
+
+		srand48( time(NULL) );
+		for(int i = 0;i < options.m; ++i) {
+			for(int j = 0;j < options.k; ++j) {
+				A[i*options.k + j] = drand48();
+			}
+		}
+
+		for(int i = 0;i < options.k; ++i) {
+			for(int j = 0;j < options.n; ++j) {
+				B[i*options.n + j] = drand48();
+			}
+		}
 
 	}
+	//print_matrix(A, options.m, options.k);
+	//print_matrix(B, options.k, options.n);
+
+	compute_gemm(&options, C, A, B, 3, 0);
+
+	//print_matrix(C, options.m, options.n);
+
 
 	free(C);
 	free(B);
