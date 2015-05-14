@@ -35,6 +35,11 @@ static inline void compute_gemm_blas0(CMDOptions * options,  double * C, double 
 
 static inline void compute_gemm_blas1(CMDOptions * options,  double * C, double * A, double * B)
 {
+	const uint32_t limits[2] = {
+
+	};
+
+
 	for(int i = 0;i < options->m; ++i) {
 		for(int j = 0;j < options->n;++j) {
 			C[i*options->n + j] += cblas_ddot(options->k, &A[i*options->k], 1, &B[j], options->n);
@@ -80,8 +85,11 @@ void compute_gemm(CMDOptions * options, double * C, double * A, double * B)
 		timer_after = clock() - timer_before;
 		time =  ( (double) timer_after) / CLOCKS_PER_SEC;
 		printf("TIME %d : %f\n", i, time);
-		printf("#ops/cycles %d : %f\n", i, ((double) 2*options->m*options->n*options->k) / (ticks_after - ticks_before) );
-		printf("#ops/time %d : %f\n", i, 2*options->m*options->n*options->k / time);
+		uint64_t ops = ((uint64_t)2*options->m)*options->n*options->k;
+		printf("#ops/cycles %d : %f\n", i, ((double) ops) / (ticks_after - ticks_before) );
+		double gflops = ops / time;
+		printf("GFlops (#ops/time) %d : %e\n", i, gflops);
+		printf("Efficiency (#gflops/(clock*8)) %d : %f\n", i, gflops/(3.4e9*8));
 	}
 
 }
