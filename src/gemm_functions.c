@@ -28,7 +28,16 @@ static inline void compute_gemm_blas0(CMDOptions * options,  double * C, double 
 			for(int k = 0; k < options->k;++k) {
 				 temp += A[i*options->k + k] * B[k*options->n + j];
 			}
-			C[i*options->n + j] = temp;
+			C[i*options->n + j] += temp;
+		}
+	}
+}
+
+static inline void compute_gemm_blas1(CMDOptions * options,  double * C, double * A, double * B)
+{
+	for(int i = 0;i < options->m; ++i) {
+		for(int j = 0;j < options->n;++j) {
+			C[i*options->n + j] += cblas_ddot(options->k, &A[i*options->k], 1, &B[j], options->n);
 		}
 	}
 }
@@ -46,6 +55,9 @@ void compute_gemm(CMDOptions * options, double * C, double * A, double * B)
 	switch(options->blasLevel) {
 		case 3:
 			func = &compute_gemm_blas3;
+			break;
+		case 1:
+			func = &compute_gemm_blas1;
 			break;
 		case 0:
 			func = &compute_gemm_blas0;
