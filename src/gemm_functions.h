@@ -16,6 +16,7 @@ typedef struct _CMDOptions CMDOptions;
 
 struct _CMDOptions {
 	bool test;
+	bool verbose;
 	const char * matrix_source_A;
 	const char * matrix_source_B;
 	const char * test_dest;

@@ -25,6 +25,7 @@ int process_options(CMDOptions * opts, int argc, char ** argv)
       {
         /* These options set a flag. */
         {"test", required_argument, (int*) &opts->test, 1},
+        {"verbose", no_argument, (int*) &opts->verbose, 1},
         /* These options don’t set a flag.
            We distinguish them by their indices. */
         {"matrix_a",	required_argument,  0, 'a'},
@@ -48,7 +49,9 @@ int process_options(CMDOptions * opts, int argc, char ** argv)
 		switch (c)
 		{
         	case 0:
-        		opts->test_dest = optarg;
+        		if( option_index == 0) {
+        			opts->test_dest = optarg;
+        		}
 			break;
 			case 'a':
 				opts->matrix_source_A = optarg;
@@ -95,6 +98,7 @@ int main(int argc, char ** argv)
 			.matrix_source_A = "",
 			.matrix_source_B = "",
 			.test_dest = "",
+			.verbose = false,
 			.test = false
 	};
 
@@ -147,12 +151,17 @@ int main(int argc, char ** argv)
 		}
 
 	}
-	//print_matrix(A, options.m, options.k);
-	//print_matrix(B, options.k, options.n);
+
+	if( options.verbose ) {
+		print_matrix(A, options.m, options.k);
+		print_matrix(B, options.k, options.n);
+	}
 
 	compute_gemm(&options, C, A, B);
 
-	//print_matrix(C, options.m, options.n);
+	if( options.verbose ) {
+		print_matrix(C, options.m, options.n);
+	}
 
 	if( options.test ) {
 
