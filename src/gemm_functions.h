@@ -27,7 +27,7 @@ struct _CMDOptions {
 	uint8_t configurationNumber;
 };
 
-void compute_gemm(CMDOptions * options, double * C, double * A, double * B, uint8_t level, uint8_t combination);
+void compute_gemm(CMDOptions * options, double * C, double * A, double * B);
 
 void print_matrix(double * A, uint32_t rows, uint32_t cols);
 

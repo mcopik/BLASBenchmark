@@ -19,6 +19,20 @@
 
 typedef void (*blas_function)(CMDOptions *, double *, double *, double *);
 
+static inline void compute_gemm_blas0(CMDOptions * options,  double * C, double * A, double * B)
+{
+	for(int i = 0;i < options->m; ++i) {
+		for(int j = 0;j < options->n;++j) {
+
+			double temp = 0.0;
+			for(int k = 0; k < options->k;++k) {
+				 temp += A[i*options->k + k] * B[k*options->n + j];
+			}
+			C[i*options->n + j] = temp;
+		}
+	}
+}
+
 static inline void compute_gemm_blas3(CMDOptions * options,  double * C, double * A, double * B)
 {
 	cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, options->m, options->n, options->k,
@@ -26,12 +40,15 @@ static inline void compute_gemm_blas3(CMDOptions * options,  double * C, double 
 }
 
 
-void compute_gemm(CMDOptions * options, double * C, double * A, double * B, uint8_t level, uint8_t combination)
+void compute_gemm(CMDOptions * options, double * C, double * A, double * B)
 {
 	blas_function func;
-	switch(level) {
+	switch(options->blasLevel) {
 		case 3:
 			func = &compute_gemm_blas3;
+			break;
+		case 0:
+			func = &compute_gemm_blas0;
 			break;
 		default:
 			printf("Not implemented!\n");

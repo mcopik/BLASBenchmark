@@ -113,11 +113,21 @@ int main(int argc, char ** argv)
 	if( options.test ) {
 		//load data
 		FILE * file = fopen(options.matrix_source_A,"r");
-		fread(A, sizeof(double), options.m*options.k,file);
+		if( !file ) {
+			printf("Fatal error! File %s can't be opened\n", options.matrix_source_A);
+			return 1;
+		}
+		size_t count = fread(A, sizeof(double), options.m*options.k,file);
+		assert( count == options.m*options.k);
 		fclose(file);
 
 		file = fopen(options.matrix_source_B,"r");
-		fread(B, sizeof(double), options.k*options.n,file);
+		if( !file ) {
+			printf("Fatal error! File %s can't be opened\n", options.matrix_source_B);
+			return 1;
+		}
+		count = fread(B, sizeof(double), options.k*options.n,file);
+		assert( count == options.n*options.k);
 		fclose(file);
 
 		options.iterations = 1;
@@ -140,7 +150,7 @@ int main(int argc, char ** argv)
 	//print_matrix(A, options.m, options.k);
 	//print_matrix(B, options.k, options.n);
 
-	compute_gemm(&options, C, A, B, 3, 0);
+	compute_gemm(&options, C, A, B);
 
 	//print_matrix(C, options.m, options.n);
 
@@ -148,15 +158,20 @@ int main(int argc, char ** argv)
 
 		double * C_dest = malloc( sizeof(double) * options.m * options.n);
 		FILE * file = fopen(options.test_dest,"r");
-		fread(C_dest, sizeof(double), options.m*options.n,file);
+		if( !file ) {
+			printf("Fatal error! File %s can't be opened\n", options.test_dest);
+			return 1;
+		}
+		size_t count = fread(C_dest, sizeof(double), options.m*options.n,file);
 		fclose(file);
+		assert( count == options.n*options.m);
 
 		for(int i = 0;i < options.m;++i) {
 			for(int j = 0;j < options.n;++j) {
 				uint32_t index = i*options.n + j;
 				if( fabs(C_dest[index] - C[index]) > DOUBLE_EPS ) {
 
-					printf("Position: (%d,%d), expected %f and value %f\n", i, j, C_dest[index],C[index]);
+					printf("Position: (%d,%d), expected %f, got %f\n", i, j, C_dest[index],C[index]);
 					assert( false );
 				}
 			}
