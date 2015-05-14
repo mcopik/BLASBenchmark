@@ -1,6 +1,6 @@
 BLAS_LOCATION=/usr/lib/openblas-base
 
-CXXFLAGS =-O2 -g -L $(BLAS_LOCATION)  -std=c99
+CXXFLAGS =-O2 -g -L $(BLAS_LOCATION) -Winline -std=c99
 CXX = gcc
 SRCS = $(wildcard src/*.c)
 SRCDIR = src

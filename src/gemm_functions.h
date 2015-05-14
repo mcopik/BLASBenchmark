@@ -11,8 +11,10 @@
 #include <stdbool.h>
 
 
+struct _CMDOptions;
+typedef struct _CMDOptions CMDOptions;
 
-typedef struct _CMDOptions {
+struct _CMDOptions {
 	bool test;
 	const char * matrix_source_A;
 	const char * matrix_source_B;
@@ -23,7 +25,7 @@ typedef struct _CMDOptions {
 	uint8_t iterations;
 	uint8_t blasLevel;
 	uint8_t configurationNumber;
-} CMDOptions;
+};
 
 void compute_gemm(CMDOptions * options, double * C, double * A, double * B, uint8_t level, uint8_t combination);
 

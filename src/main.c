@@ -20,7 +20,7 @@ int process_options(CMDOptions * opts, int argc, char ** argv)
     struct option long_options[] =
       {
         /* These options set a flag. */
-        {"test", required_argument, &opts->test, 1},
+        {"test", required_argument, (int*) &opts->test, 1},
         /* These options don’t set a flag.
            We distinguish them by their indices. */
         {"matrix_a",	required_argument,  0, 'a'},
