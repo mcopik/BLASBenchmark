@@ -35,15 +35,19 @@ static inline void compute_gemm_blas0(CMDOptions * options,  double * C, double 
 
 static inline void compute_gemm_blas1(CMDOptions * options,  double * C, double * A, double * B)
 {
-	const uint32_t limits[2] = {
-
-	};
-
 
 	for(int i = 0;i < options->m; ++i) {
 		for(int j = 0;j < options->n;++j) {
 			C[i*options->n + j] += cblas_ddot(options->k, &A[i*options->k], 1, &B[j], options->n);
 		}
+	}
+}
+
+static inline void compute_gemm_blas2(CMDOptions * options,  double * C, double * A, double * B)
+{
+	for(int i = 0;i < options->k; ++i) {
+		cblas_dger(CblasRowMajor, options->m, options->n, 1.0, &A[i], options->k, &B[i*options->n],
+					1, C, options->n);
 	}
 }
 
@@ -61,6 +65,9 @@ void compute_gemm(CMDOptions * options, double * C, double * A, double * B)
 		case 3:
 			func = &compute_gemm_blas3;
 			break;
+		case 2:
+			func = &compute_gemm_blas2;
+			break;
 		case 1:
 			func = &compute_gemm_blas1;
 			break;
@@ -69,6 +76,7 @@ void compute_gemm(CMDOptions * options, double * C, double * A, double * B)
 			break;
 		default:
 			printf("Not implemented!\n");
+			return;
 	}
 
 	uint64_t ticks_before, ticks_after;
