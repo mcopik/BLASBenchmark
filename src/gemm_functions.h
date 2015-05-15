@@ -10,6 +10,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+/**
+ * L3 cache size is 8 MB - 2000x2000 doubles will give over 30 MB
+ */
+#define CACHE_TRASHING_SIZE 2000
 
 struct _CMDOptions;
 typedef struct _CMDOptions CMDOptions;
@@ -17,6 +21,7 @@ typedef struct _CMDOptions CMDOptions;
 struct _CMDOptions {
 	bool test;
 	bool verbose;
+	bool trashing;
 	const char * matrix_source_A;
 	const char * matrix_source_B;
 	const char * test_dest;

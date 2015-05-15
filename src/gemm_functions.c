@@ -4,12 +4,16 @@
  *  Created on: May 13, 2015
  *      Author: mcopik
  */
+
+//enable drand48 in C99 - declarations of functions are in a conditional preprocessor directive
+#define _XOPEN_SOURCE
+#include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <string.h>
 
 #include "cblas.h"
 #include "gemm_functions.h"
-
 
 #define get_ticks(var) { \
   unsigned int __a, __d; \
@@ -83,6 +87,16 @@ void compute_gemm(CMDOptions * options, double * C, double * A, double * B)
 	clock_t timer_before, timer_after;
 	double time = 0.0;
 
+	double * cache_trashing = NULL;
+	if( options->trashing ) {
+		cache_trashing = malloc( sizeof(double)*CACHE_TRASHING_SIZE*CACHE_TRASHING_SIZE );
+		for(int i = 0;i < CACHE_TRASHING_SIZE;++i) {
+			for(int j = 0;j < CACHE_TRASHING_SIZE;++j) {
+				cache_trashing[i*CACHE_TRASHING_SIZE + j] += drand48();
+			}
+		}
+	}
+
 	for(int i = 0; i < options->iterations; ++i) {
 
 	    timer_before = clock();
@@ -92,6 +106,15 @@ void compute_gemm(CMDOptions * options, double * C, double * A, double * B)
 		get_ticks(ticks_after);
 		timer_after = clock() - timer_before;
 		time =  ( (double) timer_after) / CLOCKS_PER_SEC;
+
+		if( cache_trashing ) {
+			for(int i = 0;i < CACHE_TRASHING_SIZE;++i) {
+				for(int j = 0;j < CACHE_TRASHING_SIZE;++j) {
+					cache_trashing[i*CACHE_TRASHING_SIZE + j] += 10.01;
+				}
+			}
+		}
+
 		printf("TIME %d : %f\n", i, time);
 		uint64_t ops = ((uint64_t)2*options->m)*options->n*options->k;
 		printf("#ops/cycles %d : %f\n", i, ((double) ops) / (ticks_after - ticks_before) );
@@ -100,6 +123,7 @@ void compute_gemm(CMDOptions * options, double * C, double * A, double * B)
 		printf("Efficiency (#gflops/(clock*8)) %d : %f\n", i, gflops/(3.4e9*8));
 	}
 
+	free( cache_trashing );
 }
 
 

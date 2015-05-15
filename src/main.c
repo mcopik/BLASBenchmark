@@ -26,6 +26,7 @@ int process_options(CMDOptions * opts, int argc, char ** argv)
         /* These options set a flag. */
         {"test", required_argument, (int*) &opts->test, 1},
         {"verbose", no_argument, (int*) &opts->verbose, 1},
+        {"trashing", no_argument, (int*) &opts->trashing, 1},
         /* These options don’t set a flag.
            We distinguish them by their indices. */
         {"matrix_a",	required_argument,  0, 'a'},
@@ -99,6 +100,7 @@ int main(int argc, char ** argv)
 			.matrix_source_B = "",
 			.test_dest = "",
 			.verbose = false,
+			.trashing = false,
 			.test = false
 	};
 

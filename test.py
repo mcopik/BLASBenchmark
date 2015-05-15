@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import os,sys,subprocess;
+import os, sys, subprocess;
 
 test_data = [ (10,10,10) , (500,400,300), (2000,1500,1000)   ];
 
@@ -22,4 +22,7 @@ for x in test_data:
 		args.append('--blas_level');
 		args.append(str( level ));
 		print(' '.join(args) );
-		subprocess.Popen(args).wait();
+		process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE);
+		process.wait();
+		out, err = process.communicate()
+		print(out)
