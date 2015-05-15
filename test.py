@@ -25,4 +25,4 @@ for x in test_data:
 		process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE);
 		process.wait();
 		out, err = process.communicate()
-		print(out)
+		
